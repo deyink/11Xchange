@@ -1,47 +1,45 @@
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFonts } from 'expo-font';
 import HorizontalLine from '../components/HorizontalLine';
-import { Dropdown } from 'react-native-element-dropdown';
+import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
 
 
 
 const Homepage = () => {
-    const [dropdown, setDropdown] = useState(null);
-    const [selectedFro, setSelectedFro] = useState([]);
-    const [selectedTo, setSelectedTo] = useState([]);
-    const [selected, setSelected] = useState();
-    const [from, setFrom] = useState()
-    const [to, setTo] = useState()
+    const [info, setInfo] = useState(0); // exchange rate
+    const [currencies, setCurrencies] = useState({}); //Currency
+    const [input, setInput] =useState(0);       //Amount
+    const [output, setOutput] = useState(0);      //
+    // const [selectedFro, setSelectedFro] = useState([]);
+    // const [selectedTo, setSelectedTo] = useState([]);
+    // const [selected, setSelected] = useState();
+    const [from, setFrom] = useState('USD')
+    const [to, setTo] = useState('NGN')
     const [loaded] = useFonts({Play:require('../assets/fonts/PlaywriteUSTrad-VariableFont_wght.ttf'),});
     
     if(!loaded) return null;
 
-    
-    const data = [
-      {label: 'KPR', value: '1'},
-      {label: 'YNG', value: '2'},
-      {label: 'NGN', value: '3'},
-      {label: 'USD', value: '4'}
-    ]
-
-    
-const flip = ()=>{
-  temp = from
-  setFrom(to);
-  setTo(temp)
-  console.log('flipped')
-}
+    const convert = ()=>{
+      let result = (input * info).toFixed(2);
+      setOutput(result);
+    }
  
-  //   const _renderItem = item => {
-  //     return (
-  //     <View style={styles.item}>
-  //         <Text style={styles.textItem}>{item.label}</Text>
-  //         {/* <Image style={styles.icon} > {item.uri} </Image> */}
-  //     </View>
-  //     );
-  // };
-  
+
+    useEffect(() => {
+      axios.get('https://v6.exchangerate-api.com/v6/3429a6d8dbf9af491e66dbff/latest/USD')
+        .then(response => {
+          setCurrencies(response.data.conversion_rates);
+          setInfo(response.data.conversion_rates[to])
+          
+        })
+        .catch(error => {
+          console.error('Error fetching the currency data:', error);
+          
+        });
+    }, []);  
+
 
   return (
     <View style={{backgroundColor:'gray', height:'100%', width:'100%', paddingHorizontal:'.5%' }} >
@@ -52,78 +50,53 @@ const flip = ()=>{
 
             <Text style={{color:'#fffcf3', marginHorizontal:'auto', fontSize:21, }} > Converter</Text>
 
-            <View style={{flexDirection:'row', marginTop:'10%', justifyContent:'space-evenly'}} >
+            <View style={{flexDirection:'row', marginTop:'10%', flexDirection:'row', alignItems:'center', justifyContent:'center',  justifyContent:'space-evenly'}} >
+
+            <Picker style={styles.picker}
+          selectedValue={from}
+          onValueChange={(itemValue) => setFrom(itemValue)}>
+            {Object.keys(currencies).map((currency) =>
+            (<Picker.Item key={currency} label={currency} value={currency} /> ))}
+    
+
+        </Picker>
+        <Picker style={styles.picker}
+          selectedValue={to}
+          onValueChange={(itemValue, ) => setTo(itemValue)}>
+            {Object.keys(currencies).map((currency)=>(
+              <Picker.Item key={currency} label={currency} value={currency} />
+            ))}
+
+        </Picker>
 
        
-                <Dropdown
-                    style={styles.dropdown}
-                    containerStyle={styles.shadow}
-                    data={data}
-                    // search
-                    // searchPlaceholder="Search"
-                    labelField="label"
-                    valueField="value"
-                    label="Dropdown"
-                    placeholder={'Currency'}
-                    value={dropdown}
-                    onChange={item => {
-                    setDropdown(item.label);
-                        console.log('selected', item);
-                        setSelectedFro(item.label)
-                    }}
-                    // renderLeftIcon={() => (
-                    //     <Image style={styles.icon} source={require('./assets/account.png')} />
-                    // )}
-                    // renderItem={item => _renderItem(item)}
-                    // textError="Error"
-                />
-                
-                <TouchableOpacity onPress={()=>flip()}  >
-                <Image  source={require('../assets/icons/swap.png')} />
-                </TouchableOpacity>
 
               
-              <Dropdown
-                    style={styles.dropdown}
-                    containerStyle={styles.shadow}
-                    data={data}
-                    // search
-                    // searchPlaceholder="Search"
-                    labelField="label"
-                    valueField="value"
-                    label="Dropdown"
-                    placeholder={'Currency'}
-                    value={dropdown}
-                    onChange={item => {
-                    setDropdown(item.label);
-                        console.log('selected', item);
-                        setSelectedTo(item.label)
-                    }}
-                    // renderLeftIcon={() => (
-                    //     <Image style={styles.icon} source={require('./assets/account.png')} />
-                    // )}
-                    // renderItem={item => _renderItem(item)}
-                    // textError="Error"
-                />
+        
       
             </View>
 
         </View>
 
-        <View style={{backgroundColor:'white', height:'50%',  width:'90%', padding:'5%',  marginHorizontal:'auto', top:'-16%', borderRadius:20 }} >
-            <Text style={{fontSize:13}} >from</Text>
-            <HorizontalLine />
-            <Text> {selectedFro} </Text>
-            <TextInput style={{height:35, width:'99%', color:'black', borderWidth:.5, borderRadius:10, placeholder:'Enter Amount',   }} ></TextInput>
-        
-            <Text style={{fontSize:13, marginTop:'10%'}} >To</Text>
-            <HorizontalLine />
-            <Text> {selectedTo} </Text>
-           
-            <TextInput style={{height:32, width:'99%', color:'black', borderWidth:.5, borderRadius:10  }} ></TextInput>
+        <View style={{backgroundColor:'white', height:'40%', width:'90%', padding:'5%',  marginHorizontal:'auto', top:'-16%', borderRadius:20 }} >
+    
+
+            {/* <Text style={{fontSize:13}} >from</Text>
+            <HorizontalLine /> */}
+            {/* <Text> {selectedFro} </Text> */}
+            <TextInput keyboardType='numeric' onChange={(e)=>setInput(e.nativeEvent.text)} style={{height:35, width:'99%', color:'black', borderWidth:.5, borderRadius:10, placeholder:'Enter Amount', height:'20%', paddingHorizontal:10, fontSize:20, marginTop:'10%'  }} ></TextInput>
+
+            
+       
+
+          <TouchableOpacity onPress={()=>convert()} style={{padding:20, marginTop:'10%', backgroundColor:'blue' }} >
+            <Text style={{textAlign:'center'}} > CONVERT </Text>
+          </TouchableOpacity>
 
 
+          <Text style={{bottom:'-25%', textAlign:'right'}} > {input} =  {output} {to}  </Text>
         </View>
+
 
       </View>
     
@@ -159,5 +132,13 @@ textItem: {
     flex: 1,
     fontSize: 16,
     
+},
+picker:{
+  height:50,
+  marginHorizontal:10,
+  flex: 1,
+  backgroundColor:'#fffcf3',
+  borderRadius:200
+  
 }
 })
