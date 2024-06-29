@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, BackHandler, ToastAndroid } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useFonts } from 'expo-font';
 import HorizontalLine from '../components/HorizontalLine';
@@ -18,8 +18,6 @@ const Homepage = () => {
     const [loadedP] = useFonts({Play:require('../assets/fonts/PlaywriteUSTrad-VariableFont_wght.ttf'),});
     const [loadedS] = useFonts({Sans:require('../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf'),});
     
-    if(!loadedP) return null;
-    if(!loadedS) return null;
 
     const convert = ()=>{
       let result = (input * info).toFixed(2);
@@ -46,6 +44,18 @@ const Homepage = () => {
           
         });
     }, []);  
+
+    useEffect(() => {
+      const backAction = () => {
+        ToastAndroid.show("Exiting the app", ToastAndroid.SHORT);
+        BackHandler.exitApp();
+        return true;
+      };
+  
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+  
+     return () => backHandler.remove(); // Cleanup the backHandler on component unmount
+    }, []);
 
 
   return (
