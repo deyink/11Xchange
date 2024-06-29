@@ -8,22 +8,29 @@ import axios from 'axios';
 
 
 const Homepage = () => {
+    const [clear, setClear] = useState(null)
     const [info, setInfo] = useState(0); // exchange rate
     const [currencies, setCurrencies] = useState({}); //Currency
     const [input, setInput] =useState(0);       //Amount
     const [output, setOutput] = useState(0);      //
-    // const [selectedFro, setSelectedFro] = useState([]);
-    // const [selectedTo, setSelectedTo] = useState([]);
-    // const [selected, setSelected] = useState();
     const [from, setFrom] = useState('USD')
     const [to, setTo] = useState('NGN')
-    const [loaded] = useFonts({Play:require('../assets/fonts/PlaywriteUSTrad-VariableFont_wght.ttf'),});
+    const [loadedP] = useFonts({Play:require('../assets/fonts/PlaywriteUSTrad-VariableFont_wght.ttf'),});
+    const [loadedS] = useFonts({Sans:require('../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf'),});
     
-    if(!loaded) return null;
+    if(!loadedP) return null;
+    if(!loadedS) return null;
 
     const convert = ()=>{
       let result = (input * info).toFixed(2);
       setOutput(result);
+    }
+
+    const handleInput=(e)=>{
+      inputEvent = e.nativeEvent.text
+      setInput(inputEvent);
+      convert();
+      inputEvent.length === 0 ? setClear(true) : setClear(false) 
     }
  
 
@@ -44,11 +51,11 @@ const Homepage = () => {
   return (
     <View style={{backgroundColor:'gray', height:'100%', width:'100%', paddingHorizontal:'.5%' }} >
 
-      <View style={{backgroundColor:'#5072A7', height:'50%', width:'100%', top:'-10%',            borderRadius:60, paddingHorizontal:'2%' }} >
+      <View style={{backgroundColor:'#5072A7', height:'65%', width:'100%', top:'-10%', borderRadius:60, paddingHorizontal:'2%' }} >
 
-            <Text style={{color:'#fffcf3', marginTop:'35%', marginHorizontal:'auto', fontSize:24, fontFamily:'Play' }} > 11 Xchange  </Text>
+            <Text style={{color:'#fffcf3', marginTop:'30%', marginHorizontal:'auto', fontSize:24, fontFamily:'Play' }} > 11 Xchange  </Text>
 
-            <Text style={{color:'#fffcf3', marginHorizontal:'auto', fontSize:21, }} > Converter</Text>
+            <Text style={{color:'#fffcf3', marginHorizontal:'auto', fontSize:21, fontFamily:'Sans' }} > Converter</Text>
 
             <View style={{flexDirection:'row', marginTop:'10%', flexDirection:'row', alignItems:'center', justifyContent:'center',  justifyContent:'space-evenly'}} >
 
@@ -68,33 +75,28 @@ const Homepage = () => {
             ))}
 
         </Picker>
-
-       
-
-              
-        
-      
-            </View>
+        </View>
 
         </View>
 
-        <View style={{backgroundColor:'white', height:'40%', width:'90%', padding:'5%',  marginHorizontal:'auto', top:'-16%', borderRadius:20 }} >
+        <View style={{backgroundColor:'white', height:'40%', width:'93%', padding:'5%',  marginHorizontal:'auto', top:'-28%', borderRadius:20 }} >
     
 
             {/* <Text style={{fontSize:13}} >from</Text>
             <HorizontalLine /> */}
             {/* <Text> {selectedFro} </Text> */}
-            <TextInput keyboardType='numeric' onChange={(e)=>setInput(e.nativeEvent.text)} style={{height:35, width:'99%', color:'black', borderWidth:.5, borderRadius:10, placeholder:'Enter Amount', height:'20%', paddingHorizontal:10, fontSize:20, marginTop:'10%'  }} ></TextInput>
+            <TextInput keyboardType='numeric' onChange={ (e)=> handleInput(e) } 
+              style={{height:35, width:'99%', color:'black', borderWidth:.5, borderRadius:10, placeholder:'Enter Amount', height:'20%', paddingHorizontal:10, fontSize:20, marginTop:'10%'  }} ></TextInput>
 
             
        
 
-          <TouchableOpacity onPress={()=>convert()} style={{padding:20, marginTop:'10%', backgroundColor:'blue' }} >
-            <Text style={{textAlign:'center'}} > CONVERT </Text>
+          <TouchableOpacity onPress={()=>convert()} style={{padding:16, marginTop:'10%', backgroundColor:'#5072A7', borderRadius:50 }} >
+            <Text style={{textAlign:'center', color:'white', fontFamily:'Sans', fontSize:16 }} > CONVERT </Text>
           </TouchableOpacity>
 
 
-          <Text style={{bottom:'-25%', textAlign:'right'}} > {input} =  {output} {to}  </Text>
+          <Text style={{bottom:'-25%', textAlign:'right'}} > {from} {input} =  {output.toLocaleString()} {to}  </Text>
         </View>
 
 
@@ -142,3 +144,6 @@ picker:{
   
 }
 })
+
+
+
